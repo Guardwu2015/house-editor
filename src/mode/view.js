@@ -22,8 +22,8 @@ export default class ViewMode {
 
   onPointerdown (e) {
     const pt = e.data.global
-    const rd = this.he.$refs.rd
-    rd.style.transform = `translate(${pt.x + 45}px, ${pt.y - 90}px)`
+    // const rd = this.he.$refs.rd
+    // rd.style.transform = `translate(${pt.x + 45}px, ${pt.y - 90}px)`
     const selected = this.he.selected
     selected.type = null
     selected.item = null

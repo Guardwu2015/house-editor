@@ -1,4 +1,4 @@
-import C from '../constants'
+import C from '../utils/constants'
 
 function approximately (a, b, epsilon = C.EPSILON) {
   if (b instanceof Array) {

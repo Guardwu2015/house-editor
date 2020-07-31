@@ -1,7 +1,9 @@
 <template>
     <div class='house-editor' ref='houseEditor'>
-      <div class='sidebar-left' v-if="false">
-        <div class='left-main'></div>
+      <div class='sidebar-left' ref='hideLeft' v-show="kitsShow">
+        <div class='left-main'>
+          <h3 class='house-design'>户型设计</h3>
+        </div>
         <div class='hide-left-btn'></div>
       </div>
     </div>
@@ -29,6 +31,11 @@ export default {
         alignment: null,
         copy: null // 临摹图容器
       },
+      viewportFixedData: {
+        x: null,
+        y: null,
+        scale: null
+      },
       eventInfo: {
         kind: null,
         data: null
@@ -36,7 +43,8 @@ export default {
       mode: 'view',
       modeHandlers: {
         view: new ViewMode(this)
-      }
+      },
+      kitsShow: true
     }
   },
   computed: {
@@ -64,6 +72,9 @@ export default {
       this.house = new House(this)
       this.house.loadData(clone(newData))
     }
+  },
+  created () {
+    this.house = new House(this)
   },
   mounted () {
     this.init()
@@ -107,11 +118,11 @@ export default {
 
       // window.addEventListener('keydown', this.keyboardEventHandler)
 
-      // document.addEventListener('click', (e) => {
-      //   if (e.target.id !== 'ca' && e.target.id !== 'ca_wrapper') {
-      //     this.caShow = false
-      //   }
-      // })
+      document.addEventListener('click', (e) => {
+        if (e.target.id !== 'ca' && e.target.id !== 'ca_wrapper') {
+          this.caShow = false
+        }
+      })
     },
     initContainers () {
       this.containers.axis = new px.Container()
@@ -146,14 +157,14 @@ export default {
           maxWidth: C.SCALE_MAX_WIDTH
         })
 
-      // this.bindViewportEvent('pointerdown')
-      // this.bindViewportEvent('pointermove')
-      // this.bindViewportEvent('pointerup')
-      // this.bindViewportEvent('rightclick')
-      // this.bindViewportEvent('drag-start')
-      // this.bindViewportEvent('drag-end')
-      // this.bindViewportEvent('clicked')
-      // this.bindViewportEvent('wheel')
+      this.bindViewportEvent('pointerdown')
+      this.bindViewportEvent('pointermove')
+      this.bindViewportEvent('pointerup')
+      this.bindViewportEvent('rightclick')
+      this.bindViewportEvent('drag-start')
+      this.bindViewportEvent('drag-end')
+      this.bindViewportEvent('clicked')
+      this.bindViewportEvent('wheel')
     },
     bindViewportEvent (eventName) {
       const eventCallbackName = `on${_.upperFirst(_.camelCase(eventName))}`
@@ -188,6 +199,21 @@ export default {
         self.updateFixedViewport()
         return returnValue
       })
+    },
+    syncModeStatus () {
+      this.viewport.cursor = this.handler.cursor()
+    },
+    updateFixedViewport () {
+      if (this.viewportFixedData.x != null) {
+        this.viewport.x = this.viewportFixedData.x
+      }
+      if (this.viewportFixedData.y != null) {
+        this.viewport.y = this.viewportFixedData.y
+      }
+      if (this.viewportFixedData.scale != null) {
+        this.viewport.scale.x = this.viewportFixedData.scale
+        this.viewport.scale.y = this.viewportFixedData.scale
+      }
     },
     drawGrid () {
       if (this.containers.axis) {

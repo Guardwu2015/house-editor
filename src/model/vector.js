@@ -1,7 +1,7 @@
 import _ from 'lodash'
 
 import C from '../utils/constants'
-import u from './utils'
+import u from './util'
 import {
   clone,
   equals

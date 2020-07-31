@@ -1,7 +1,7 @@
 import px from '../utils/pixi-wrapper'
 import C from '../utils/constants'
 import Vector from './vector'
-import u from './utils'
+import u from './util'
 
 export default class Window extends Vector {
   constructor ({

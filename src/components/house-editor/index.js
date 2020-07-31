@@ -1,3 +1,3 @@
-import HouseEditor from './houseEditor.vue'
+import HouseEditor from './HouseEditor.vue'
 
 export default HouseEditor
