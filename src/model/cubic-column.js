@@ -1,5 +1,5 @@
 import px from '../utils/pixi-wrapper'
-import C from '../utils/onstants'
+import C from '../utils/constants'
 // import Vector from './vector'
 // import u from './utils'
 

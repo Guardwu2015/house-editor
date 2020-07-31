@@ -1,10 +1,10 @@
 import _ from 'lodash'
 
-import px from '../pixi-wrapper'
+import px from '../utils/pixi-wrapper'
 import C from '../utils/constants'
 import Wall from './wall'
 import Door from './door'
-import u from './utils'
+import u from './util'
 import Vector from './vector'
 import Window from './window'
 import CubicColumn from './cubic-column'
@@ -14,7 +14,7 @@ import { hasOwnProperty } from '../utils/util'
 
 import {
   delay
-} from '../../../kits/delay'
+} from '../utils/delay'
 
 export default class House {
   constructor (houseEditor) {
