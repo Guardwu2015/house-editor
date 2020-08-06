@@ -3,21 +3,72 @@
       <div class='sidebar-left' ref='hideLeft' v-show="kitsShow">
         <div class='left-main'>
           <h3 class='house-design'>户型设计</h3>
+          <draw-toolbox title="墙" :open="true">
+            <template slot="box-items">
+              <img-button :value="mode" @change="setMode" set-value="draw-wall:non-bearing" class-name="wall" text="画墙"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-wall:room" class-name="room" text="画房间"/>
+              <el-input v-if="mode && mode.startsWith('draw-wall:')"
+                        size="mini" type="number" v-model.number="handler.thickness" :min="10" :max="500"></el-input>
+            </template>
+          </draw-toolbox>
+          <draw-toolbox title="门">
+            <template slot="box-items">
+              <img-button :value="mode" @change="setMode" set-value="draw-door:single" class-name="single" text="单开门"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-door:equal-double" class-name="double"
+                          text="双开门"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-door:sliding" class-name="sliding" text="推拉门"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-door:opening" class-name="opening" text="门洞"/>
+            </template>
+          </draw-toolbox>
+          <draw-toolbox title="窗">
+            <template slot="box-items">
+              <img-button :value="mode" @change="setMode" set-value="draw-window:common" class-name="window" text="窗"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-window:french" class-name="french" text="落地窗"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-window:railing" class-name="railing" text="栏杆"/>
+            </template>
+          </draw-toolbox>
+          <draw-toolbox title="结构部件">
+            <template slot="box-items">
+              <img-button :value="mode" @change="setMode" set-value="draw-cubiccolumn:pillar" class-name="pillar"
+                          text="柱"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-cubiccolumn:flue" class-name="flue" text="烟道"/>
+              <img-button :value="mode" @change="setMode" set-value="draw-cubiccolumn:water-point"
+                          class-name="water-point" text="水电位"/>
+            </template>
+          </draw-toolbox>
         </div>
         <div class='hide-left-btn'></div>
       </div>
+      <top-side-bar @completedClick="completedClick" />
     </div>
 </template>
 
 <script>
+/* eslint-disable no-prototype-builtins */
 import _ from 'lodash'
 import { clone } from '@/utils/object'
 import px from '@/utils/pixi-wrapper'
 import C from '@/utils/constants'
-import ViewMode from '@/mode/view'
 import House from '@/model/house'
+
+// mode
+import ViewMode from '@/mode/view'
+import DrawWallMode from '@/mode/draw-wall'
+import DrawDoorMode from '@/mode/draw-door'
+import DrawWinMode from '@/mode/draw-window'
+import DrawRoom from '@/mode/draw-room'
+import DrawCubicColumn from '@/mode/draw-cubic-column'
+
+import TopSideBar from '@/components/top-side-bar'
+import DrawToolbox from '@/components/draw-tool-box'
+import ImgButton from '@/components/img-button'
 export default {
   name: 'house-editor',
+  components: {
+    TopSideBar,
+    DrawToolbox,
+    ImgButton
+  },
   data () {
     return {
       containers: {
@@ -42,9 +93,30 @@ export default {
       },
       mode: 'view',
       modeHandlers: {
-        view: new ViewMode(this)
+        view: new ViewMode(this),
+        'draw-wall:non-bearing': new DrawWallMode(this, 'NON_BEARING'),
+        'draw-wall:room': new DrawRoom(this, 'NON_BEARING'),
+
+        'draw-door:single': new DrawDoorMode(this, 'SINGLE'),
+        'draw-door:equal-double': new DrawDoorMode(this, 'EQUAL_DOUBLE'),
+        'draw-door:sliding': new DrawDoorMode(this, 'SLIDING'),
+        'draw-door:opening': new DrawDoorMode(this, 'OPENING'),
+
+        'draw-window:common': new DrawWinMode(this, 'COMMON'),
+        'draw-window:french': new DrawWinMode(this, 'FRENCH'),
+        'draw-window:bay-only': new DrawWinMode(this, 'BAY_ONLY'),
+        'draw-window:railing': new DrawWinMode(this, 'RAILING'),
+
+        'draw-cubiccolumn:pillar': new DrawCubicColumn(this, 'PILLAR'),
+        'draw-cubiccolumn:flue': new DrawCubicColumn(this, 'FLUE'),
+        'draw-cubiccolumn:beam': new DrawCubicColumn(this, 'BEAM'),
+        'draw-cubiccolumn:water-point': new DrawCubicColumn(this, 'WATER')
       },
-      kitsShow: true
+      kitsShow: true,
+      selected: {
+        type: null,
+        item: null
+      }
     }
   },
   computed: {
@@ -106,7 +178,7 @@ export default {
       // 绘制网格
       this.drawGrid()
 
-      // this.setMode('view')
+      this.setMode('view')
 
       this.app.view.addEventListener('contextmenu', e => e.preventDefault())
       this.$refs.houseEditor.appendChild(this.app.view)
@@ -116,7 +188,7 @@ export default {
         this.viewport.worldHeight / 2
       )
 
-      // window.addEventListener('keydown', this.keyboardEventHandler)
+      window.addEventListener('keydown', this.keyboardEventHandler)
 
       document.addEventListener('click', (e) => {
         if (e.target.id !== 'ca' && e.target.id !== 'ca_wrapper') {
@@ -203,6 +275,16 @@ export default {
     syncModeStatus () {
       this.viewport.cursor = this.handler.cursor()
     },
+    setViewportFixed () {
+      this.viewportFixedData.x = this.viewport.x
+      this.viewportFixedData.y = this.viewport.y
+      this.viewportFixedData.scale = this.viewport.scale.x
+    },
+    cancelFixViewport () {
+      this.viewportFixedData.x = null
+      this.viewportFixedData.y = null
+      this.viewportFixedData.scale = null
+    },
     updateFixedViewport () {
       if (this.viewportFixedData.x != null) {
         this.viewport.x = this.viewportFixedData.x
@@ -251,7 +333,21 @@ export default {
         }
       }
     },
-    setMode (mode) {
+    setMode (name) {
+      if (this.modeHandlers.hasOwnProperty(name)) {
+        this.cancelFixViewport()
+        if (this.handler && this.handler.onDestroy) {
+          this.handler.onDestroy()
+        }
+        this.mode = name
+        this.house.initialize()
+        this.handler.initialize()
+        this.syncModeStatus()
+        this.house.updateSprites(true)
+        this.house.updateAlignments()
+      } else {
+        console.error('Mode not found:', name)
+      }
     },
     keyboardEventHandler () {
       const e = arguments[0]
@@ -302,6 +398,8 @@ export default {
       if (handled) {
         e.preventDefault()
       }
+    },
+    completedClick () {
     }
   }
 }

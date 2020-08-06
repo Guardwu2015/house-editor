@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import _ from 'lodash'
 
 import px from '../utils/pixi-wrapper'
@@ -10,7 +11,6 @@ import Window from './window'
 import CubicColumn from './cubic-column'
 import Room from './room'
 import SpritePool from '../utils/sprite-pool'
-import { hasOwnProperty } from '../utils/util'
 
 import {
   delay
@@ -267,7 +267,7 @@ export default class House {
       const w = this.walls[i]
       let intersection = w.intersect(wall)
       if (intersection) {
-        if (hasOwnProperty(intersection, 'x')) {
+        if (intersection.hasOwnProperty('x')) {
           if (u.pointApproximately(w.p1, intersection) || u.pointApproximately(w.p2, intersection)) {
             // 在w的端点，无需更新w
           } else {
@@ -447,10 +447,10 @@ export default class House {
       }
       const p1 = [u.round(wall.p1.x, C.EPSILON), u.round(wall.p1.y, C.EPSILON)].toString()
       const p2 = [u.round(wall.p2.x, C.EPSILON), u.round(wall.p2.y, C.EPSILON)].toString()
-      if (!hasOwnProperty(pointWalls, p1)) {
+      if (!pointWalls.hasOwnProperty(p1)) {
         pointWalls[p1] = []
       }
-      if (!hasOwnProperty(pointWalls, p2)) {
+      if (!pointWalls.hasOwnProperty(p2)) {
         pointWalls[p2] = []
       }
       pointWalls[p1].push(wall)
@@ -479,7 +479,7 @@ export default class House {
       let contraryPolarAngle = 180
       const walls = []
       let currentPoint = startPoint
-      while (hasOwnProperty(pointWalls, currentPoint) && pointWalls[currentPoint].length > 0) {
+      while (pointWalls.hasOwnProperty(currentPoint) && pointWalls[currentPoint].length > 0) {
         let minAngleDelta = null
         let nextWall = null
         let bestIndex = null
@@ -569,10 +569,10 @@ export default class House {
       }
       const p1 = [u.round(wall.p1.x, C.EPSILON), u.round(wall.p1.y, C.EPSILON)].toString()
       const p2 = [u.round(wall.p2.x, C.EPSILON), u.round(wall.p2.y, C.EPSILON)].toString()
-      if (!hasOwnProperty(pointWalls, p1)) {
+      if (!pointWalls.hasOwnProperty(p1)) {
         pointWalls[p1] = []
       }
-      if (!hasOwnProperty(pointWalls, p2)) {
+      if (!pointWalls.hasOwnProperty(p2)) {
         pointWalls[p2] = []
       }
       pointWalls[p1].push([wall.polarAngle(), wall, 'p1'])
@@ -975,7 +975,7 @@ export default class House {
         const vi = vectors[i]
         const vj = vectors[j]
         const intersection = vi.lineIntersect(vj)
-        if (intersection && hasOwnProperty(intersection, 'x')) {
+        if (intersection && intersection.hasOwnProperty('x')) {
           const d = u.pointDist(intersection, {
             x,
             y

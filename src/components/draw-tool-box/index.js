@@ -1,3 +1,3 @@
-import DrawToolBox from './DrawToolBox.vue'
+import DrawToolbox from './DrawToolbox.vue'
 
-export default DrawToolBox
+export default DrawToolbox

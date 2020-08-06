@@ -1,3 +1,3 @@
-import ImgButton from './imgButton.vue'
+import ImgButton from './ImgButton.vue'
 
 export default ImgButton

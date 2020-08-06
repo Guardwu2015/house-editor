@@ -1,3 +1,4 @@
+/* eslint-disable no-prototype-builtins */
 import _ from 'lodash'
 
 import C from '../utils/constants'
@@ -6,8 +7,6 @@ import {
   clone,
   equals
 } from '../utils/object'
-
-import { hasOwnProperty } from '../utils/util'
 
 export default class Vector {
   static LINE_COINCIDE = Symbol('The two lines are coincided')
@@ -32,7 +31,7 @@ export default class Vector {
     const data = this.result()
     if (updates) {
       for (const key of Object.keys(updates)) {
-        if (hasOwnProperty(data, key)) {
+        if (data.hasOwnProperty(key)) {
           data[key] = updates[key]
         }
       }
@@ -139,7 +138,7 @@ export default class Vector {
   }
 
   lineDistTo (other) {
-    if (hasOwnProperty(other, 'x')) {
+    if (other.hasOwnProperty('x')) {
       // other is a point
       if (this.isPoint()) {
         return u.pointDist(this.center(), other)
@@ -182,7 +181,7 @@ export default class Vector {
   }
 
   distTo (other) {
-    if (hasOwnProperty(other, 'x')) {
+    if (other.hasOwnProperty('x')) {
       // other is a point
       if (this.isPoint()) {
         return u.pointDist(this.center(), other)
@@ -211,7 +210,7 @@ export default class Vector {
 
   lineContains (item) {
     const e = C.MM_EPSILON
-    if (hasOwnProperty(item, 'x')) {
+    if (item.hasOwnProperty('x')) {
       return this.lineDistTo(item) < e
     } else {
       return this.lineContains(item.p1) && this.lineContains(item.p2)
@@ -220,7 +219,7 @@ export default class Vector {
 
   contains (item) {
     const e = C.MM_EPSILON
-    if (hasOwnProperty(item, 'x')) {
+    if (item.hasOwnProperty('x')) {
       return this.distTo(item) < e
     } else {
       return this.contains(item.p1) && this.contains(item.p2)
